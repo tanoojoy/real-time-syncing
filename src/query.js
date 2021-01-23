@@ -1,0 +1,33 @@
+const { MongoClient } = require('mongodb');
+
+async function main(){
+    
+    const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+    const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+    
+    try {
+        //connect to external database
+        await db_client.connect();
+
+        //select DB and collection
+        const database = db_client.db('Items');
+        const collection = database.collection('Arcadier ETL');
+
+        //choose rows in DB to query, leave empty {} to select all
+        const query = { synced:1};
+
+        //count number of rows queried
+        const cursor = await collection.find(query);
+        const result = await cursor.count();
+        console.log(result);
+       
+    }
+    catch(e){
+        console.error(e);
+    }
+    finally {
+        db_client.close();
+    }
+}
+
+main().catch(console.error); 
