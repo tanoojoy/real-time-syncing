@@ -1,6 +1,5 @@
 let client = require('../sdk/client');
 const { MongoClient } = require('mongodb');
-const { convertCompilerOptionsFromJson } = require('typescript');
 const ADMIN_ID = "af6bf51d-426e-4a31-bcfc-1ecaf706b202";
 
 const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
