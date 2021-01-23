@@ -38,7 +38,7 @@ app.get("/webhook", (req, res) => {
 });
 
 app.get("/", (req, res) => {
-  res.send("You got it motherfucker")
+  res.send("You got it!")
 });
   
 app.listen(process.env.PORT || 3000, () => {
