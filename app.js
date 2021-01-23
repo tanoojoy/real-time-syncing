@@ -36,6 +36,10 @@ app.get("/webhook", (req, res) => {
     res.send(response[0]);
   });
 });
+
+app.get("/", (req, res) => {
+  res.send("You got it motherfucker")
+});
   
 app.listen(process.env.PORT || 3000, () => {
     console.log("Express server listning on port ");
