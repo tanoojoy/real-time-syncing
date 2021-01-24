@@ -37,7 +37,7 @@ Promise.all([get_cats, connect_db]).then(async function(response){
     
     for await (const doc of cursor) {
         import_items(doc);
-        await sleep(300);
+        await cheep(300);
     }
     
 }); 
@@ -115,6 +115,6 @@ function update_db(item){
     });
 }
 
-function sleep(ms) {
+function cheep(ms) {
     return new Promise(resolve => setTimeout(resolve, ms));
 }
