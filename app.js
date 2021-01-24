@@ -51,7 +51,7 @@ app.post("/db_change", (req, res) =>{
 
   //once item is found, update that item
   Promise.all([search_item]).then(response => {
-    console.log("Found item: " + response[0].Records[0].Name);
+    console.log(response[0]);
     var options = {
       "itemId": response[0].Records[0].ID,
       "merchantId": response[0].Records[0].MerchantDetail.ID,
