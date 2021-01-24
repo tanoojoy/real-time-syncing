@@ -69,7 +69,13 @@ function import_items(item){
         "InstantBuy": item.InstantBuy,
         "Negotiation": item.Negotiation,
         "Categories": return_array,
-        "HasChildItems": false
+        "HasChildItems": false,
+        "CustomFields":[
+            {
+                "Code": "19521-DB_ID-Ee71FeXXRZ",
+                "Values": [item._id]
+            }
+        ]
     };
 
     var options = {

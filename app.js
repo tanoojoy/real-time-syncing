@@ -27,6 +27,10 @@ app.post("/webhook", (req, res) => {
   });
 });
 
+app.get("/db_change", (req, res) =>{
+  res.send(req.body);
+})
+
 app.get("/", (req, res) => {
   res.send("You got it!!!")
 });
