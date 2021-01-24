@@ -35,7 +35,7 @@ app.post("/db_change", (req, res) =>{
       {
           "Code": "19521-DB_ID-Ee71FeXXRZ",
           "Operator": "equal",
-          "Value": req.body._id.toHexString()
+          "Value": req.body._id.toString()
       }
     ]
   };
