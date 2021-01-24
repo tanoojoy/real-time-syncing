@@ -55,7 +55,7 @@ app.post("/db_change", (req, res) =>{
       "itemId": response[0].Records[0].ID,
       "merchantId": response[0].Records[0].MerchantDetail.ID,
       "data": {
-        "Name": req.body.name
+        "Name": req.body.Name
       }
     };
 
