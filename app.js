@@ -39,7 +39,7 @@ app.post("/db_change", (req, res) =>{
       }
     ]
   };
-  console.log(options)
+  console.log(options.CustomFieldQueries[0].Value)
 
   const search_item = new Promise(function(resolve, reject){
     client.Items.filterItem(options, function(err, result){
@@ -51,7 +51,7 @@ app.post("/db_change", (req, res) =>{
 
   //once item is found, update that item
   Promise.all([search_item]).then(response => {
-    console.log(response[0]);
+    console.log("Found Item: " + response[0].Records[0].Name);
     var options = {
       "itemId": response[0].Records[0].ID,
       "merchantId": response[0].Records[0].MerchantDetail.ID,
