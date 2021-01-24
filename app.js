@@ -9,21 +9,21 @@ app.use(bp.urlencoded({ extended: false }))
 app.use(bp.json());
 
 app.post("/webhook", (req, res) => {
-  console.log(req.body);
 
-});
-
-app.get("/webhook", (req, res) => {
-  const get_mp_info = new Promise(function(resolve, reject){
-    client.Marketplaces.getMarketplaceInfo(null, function(err, result){
+  const get_item = new Promise(function(resolve, reject){
+    var options = {
+      "itemId": req.body.Data.ID,
+      "activeOnly": true
+    };
+    client.Items.getItemDetails(options, function(err, result){
       if(!err){
         resolve(result);
       }
     });
   });
 
-  Promise.all([get_mp_info]).then(response => {
-    res.send(response[0]);
+  Promise.all([get_item]).then(response => {
+    main(response[0]);
   });
 });
 
@@ -35,8 +35,8 @@ app.listen(process.env.PORT || 3000, () => {
     console.log("Express server listning on port ");
 });
 
-async function main(){
-    
+async function main(item){
+  
   const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   
@@ -49,10 +49,10 @@ async function main(){
       const collection = database.collection('Arcadier ETL');
 
       //choose row in DB to modify
-      const query = { ID: "5ccbcf4d-27b1-43e1-956a-1d9492d2bc3a"};
+      const query = { ID: "5ccbcf4d-27b1-43e1-956a-1d9492d2bc3a" };
 
       //set field and value to modify
-      const result = await collection.updateOne( query, { $set: { synced: 0} })
+      const result = await collection.updateOne( query, { $set: item })
       console.log(result.result.n)
      
   }
