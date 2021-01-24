@@ -35,11 +35,11 @@ app.post("/db_change", (req, res) =>{
       {
           "Code": "19521-DB_ID-Ee71FeXXRZ",
           "Operator": "equal",
-          "Value": req.body._id
+          "Value": req.body._id.toHexString()
       }
     ]
   };
-  console.log(req.body)
+  console.log(req.body.CustomFieldQueries[0].Value)
 
   const search_item = new Promise(function(resolve, reject){
     client.Items.filterItem(options, function(err, result){
