@@ -39,6 +39,7 @@ app.post("/db_change", (req, res) =>{
       }
     ]
   };
+  console.log(req.body)
 
   const search_item = new Promise(function(resolve, reject){
     client.Items.filterItem(options, function(err, result){
