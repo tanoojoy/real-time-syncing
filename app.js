@@ -27,8 +27,51 @@ app.post("/webhook", (req, res) => {
   });
 });
 
-app.get("/db_change", (req, res) =>{
-  res.send(req.body);
+app.post("/db_change", (req, res) =>{
+
+  //look for the item that got changed
+  var options = {
+    "CustomFieldQueries": [
+      {
+          "Code": "19521-DB_ID-Ee71FeXXRZ",
+          "Operator": "equal",
+          "Value": req.body._id
+      }
+    ]
+  };
+
+  const search_item = new Promise(function(resolve, reject){
+    client.Items.filterItem(options, function(err, result){
+      if(!err){
+        resolve(result);
+      }
+    })
+  });
+
+  //once item is found, update that item
+  Promise.all([search_item]).then(response => {
+    console.log("Found item: " + response[0].Records[0].Name);
+    var options = {
+      "itemId": response[0].Records[0].ID,
+      "merchantId": response[0].Records[0].MerchantDetail.ID,
+      "data": {
+        "Name": req.body.name
+      }
+    };
+
+    const update_item = new Promise(function(resolve, reject){
+      client.Items.EditNewItem(options, function(err, result){
+        if(!err){
+          resolve(result)
+        }
+      });
+    });
+
+    Promise.all([update_item]).then(response => {
+      console.log("Updated item Name to: " + response[0].Name);
+      res.send({"Message": "Updated item Name to: " + response[0].Name});
+    });
+  });
 })
 
 app.get("/", (req, res) => {

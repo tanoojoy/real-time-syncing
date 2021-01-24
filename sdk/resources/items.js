@@ -93,6 +93,19 @@ Items.prototype.createItem = function(options, callback) {
     });
 };
 
+Items.prototype.filterItem = function(options, callback) {
+    const self = this;
+    this._acquireAdminAccessToken(function() {
+        self._makeRequest({
+            method: 'POST',
+            contentType: 'application/json',
+            accept: 'application/json',
+            path: '/api/v2/items',
+            data: options
+        }, callback);
+    });
+};
+
 Items.prototype.EditNewItem = function (options, callback) {
     const self = this;
     this._enforce(options, ['merchantId']);
