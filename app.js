@@ -8,6 +8,7 @@ app.use(require("morgan")("dev"));
 app.use(bp.urlencoded({ extended: false }))
 app.use(bp.json());
 
+//receives payload from arcadier event trigger
 app.post("/webhook", (req, res) => {
 
   const get_item = new Promise(function(resolve, reject){
@@ -27,6 +28,7 @@ app.post("/webhook", (req, res) => {
   });
 });
 
+//receives payload from Mongo DB event trigger
 app.post("/db_change", (req, res) =>{
 
   //look for the item that got changed
@@ -75,6 +77,7 @@ app.post("/db_change", (req, res) =>{
   });
 })
 
+//homepage
 app.get("/", (req, res) => {
   res.send("You got it!!!")
 });
