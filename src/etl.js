@@ -11,7 +11,7 @@ var collection;
 var i=0;
 var total=0;
 
-//get categories from Arcadier for mapping
+//get categories from Arcadier for mapping.
 const get_cats = new Promise(function(resolve, reject){
     client.Categories.getAllCategories({ "adminID": ADMIN_ID }, function (err, result){
         if(!err){

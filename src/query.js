@@ -14,12 +14,14 @@ async function main(){
         const collection = database.collection('Arcadier ETL');
 
         //choose rows in DB to query, leave empty {} to select all
-        const query = { synced:1};
+        const query = { synced: 0};
 
         //count number of rows queried
         const cursor = await collection.find(query);
         const result = await cursor.count();
-        console.log(result);
+        for await (const doc of cursor) {
+            console.log(doc)
+        }
        
     }
     catch(e){
