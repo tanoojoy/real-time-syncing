@@ -1,12 +1,15 @@
 const express = require('express');
 const bp = require("body-parser");
+const path = require("path");
 let client = require('./sdk/client');
 const { MongoClient } = require('mongodb');
+const { nextTick } = require('process');
 
 const app = express();
 app.use(require("morgan")("dev"));
 app.use(bp.urlencoded({ extended: false }))
 app.use(bp.json());
+app.set('view engine', 'ejs');
 
 //receives payload from arcadier event trigger
 app.post("/webhook", (req, res) => {
@@ -79,14 +82,111 @@ app.post("/db_change", (req, res) =>{
 
 //homepage
 app.get("/", (req, res) => {
-  res.send("You got it!!!!!!")
+  res.sendFile(path.join(__dirname+'/src/index.html'));
 });
 
+app.post("/register", async function(req, res){
+  
+  var state = await register_credentials(req.body)
+  if(state == 1){
+    var response = {
+      "status": "200",
+      "domain_registered": req.body.arcadier_domain_field 
+    }
+  }
+  // res.send(response)
+  res.render('etl', response);
+});
 
+app.get("/etl", (req, res) => {
+  if(req.status != "200"){
+    console.log("busted")
+  }
+  else{
+    console.log(req);
+  }
+  
+})
   
 app.listen(process.env.PORT || 3000, () => {
     console.log("Express server listning on port ");
 });
+
+app.post("/get_arc_categories", (req, res) =>{
+  const get_cats = new Promise(function(resolve, reject){
+    client.Categories.getCategories(null, function(err, result){
+      if(!err){
+        resolve(result)
+      }
+    }) 
+  })
+
+  Promise.all([get_cats]).then(response => {
+    res.send(response[0]);
+  })
+})
+
+app.post("/get_mongo_fields", async function(req, res) {
+  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try{
+    var array_list = [];
+    var i = 0;
+    await db_client.connect();
+
+    //select DB and collection
+    const database = db_client.db('Items');
+    const collection = database.collection('Arcadier ETL');
+
+    const cursor = await collection.find();
+    await cursor.forEach(doc => {
+      if(!array_list.includes(doc.Categories[0].Name)){
+        array_list.push(doc.Categories[0].Name);
+      }
+    })
+
+    res.send(array_list);
+  }
+  catch(e){
+    console.error(e)
+  }
+  finally{
+    db_client.close();
+  }
+})
+
+async function register_credentials(details){
+  const uri = "mongodb+srv://" + details.mongo_username + ":" + details.mongo_password + "@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  var state;
+  try {
+    //connect to external database
+    await db_client.connect();
+
+    //select DB and collection
+    const database = db_client.db('Users');
+    const collection = database.collection('Arcadier Domains');
+
+    const arcDocument = {
+      domain: details.arcadier_domain_field,
+      clientID: details.client_id_field,
+      clientSecret: details.client_secret_field,
+      mongo_username: details.mongo_username,
+      mongo_password: details.mongo_password
+    };
+
+    const result = await collection.insertOne(arcDocument);
+    state = result.insertedCount// should print 1 on successful insert
+  }
+  catch(e){
+      console.error(e);
+  }
+  finally {
+      db_client.close();
+      return state;
+  }
+}
 
 async function main(item){
   
