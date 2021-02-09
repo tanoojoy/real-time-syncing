@@ -3,7 +3,7 @@ const bp = require("body-parser");
 const path = require("path");
 let client = require('./sdk/client');
 const { MongoClient } = require('mongodb');
-const { nextTick } = require('process');
+
 
 const app = express();
 app.use(require("morgan")("dev"));
@@ -86,16 +86,17 @@ app.get("/", (req, res) => {
 });
 
 app.post("/register", async function(req, res){
-  
+  console.log(req.body);
   var state = await register_credentials(req.body)
   if(state == 1){
     var response = {
-      "status": "200",
       "domain_registered": req.body.arcadier_domain_field 
     }
+    res.send("Autehntication Sucessful");
   }
-  // res.send(response)
-  res.render('etl', response);
+  else{
+    res.send("Authentication Failed");
+  }
 });
 
 app.get("/etl", (req, res) => {
@@ -107,10 +108,6 @@ app.get("/etl", (req, res) => {
   }
   
 })
-  
-app.listen(process.env.PORT || 3000, () => {
-    console.log("Express server listning on port ");
-});
 
 app.post("/get_arc_categories", (req, res) =>{
   const get_cats = new Promise(function(resolve, reject){
@@ -127,12 +124,11 @@ app.post("/get_arc_categories", (req, res) =>{
 })
 
 app.post("/get_mongo_fields", async function(req, res) {
-  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
   try{
     var array_list = [];
-    var i = 0;
     await db_client.connect();
 
     //select DB and collection
@@ -156,6 +152,50 @@ app.post("/get_mongo_fields", async function(req, res) {
   }
 })
 
+app.post("/save_map", async function(req, res){
+  console.log(req.body);
+
+  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
+  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  try{
+    await db_client.connect();
+
+    //select DB and collection
+    const database = db_client.db('Users');
+    const collection = database.collection('Arcadier Domains');
+
+    const query = { user_email: req.body.User};
+
+    const update = {
+      $set: {
+        map:
+          req.body.List,
+      }
+    };
+
+    var result = await collection.updateOne(query, update, { upsert: true });
+    res.send({"status": "true", "message": `${result.matchedCount} document(s) matched the filter, updated ${result.modifiedCount} document(s)`})
+
+  }
+  catch(e){
+    console.error(e)
+    res.send(e);
+  }
+  finally{
+    db_client.close();
+  }
+});
+
+app.post("/start_import", async function(req, res){
+  console.log(req.body);
+  res.send("Received");
+});
+  
+app.listen(process.env.PORT || 3000, () => {
+    console.log("Express server listning on port ");
+});
+
 async function register_credentials(details){
   const uri = "mongodb+srv://" + details.mongo_username + ":" + details.mongo_password + "@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
@@ -169,9 +209,10 @@ async function register_credentials(details){
     const collection = database.collection('Arcadier Domains');
 
     const arcDocument = {
-      domain: details.arcadier_domain_field,
-      clientID: details.client_id_field,
-      clientSecret: details.client_secret_field,
+      user_email: details.user_email,
+      domain: details.arcadier_domain,
+      clientID: details.client_id,
+      clientSecret: details.client_secret,
       mongo_username: details.mongo_username,
       mongo_password: details.mongo_password
     };

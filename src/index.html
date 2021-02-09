@@ -18,31 +18,43 @@ body {font-family: "Lato", sans-serif}
         <div class="w3-container w3-content w3-padding-64" style="max-width:800px">
         <h2 class="w3-wide w3-center">Setup</h2>
 
-        <div class="w3-row-padding w3-padding-32" style="margin:0 -16px">
+        <div class="w3-row-padding w3-padding-32" style="margin:0 -16px; width: auto;">
             <div class="w3-third w3-margin-bottom">
                 <img src="https://www.w3schools.com/w3images/newyork.jpg" alt="New York" style="width:100%" class="w3-hover-opacity">
                 <div class="w3-container w3-white">
-                    <p><b>Arcadier</b></p>
-                    <button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('ticketModal').style.display='block'">Setup Arcadier Marketplace</button>
+                    <p><b>Configuration</b></p>
+                    <button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('ticketModal').style.display='block'">Authorize Arcadier & Mongo</button>
                 </div>
             </div>
         </div>
 
-        <div class="w3-row-padding w3-padding-32" style="margin:0 -16px">
+        <div class="w3-row-padding w3-padding-32" style="margin:0 -16px; width: auto;">
             <div class="w3-third w3-margin-bottom">
                 <img src="https://www.w3schools.com/w3images/newyork.jpg" alt="New York" style="width:100%" class="w3-hover-opacity">
                 <div class="w3-container w3-white">
-                    <p><b>Arcadier</b></p>
-                    <button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('cat_table').style.display='block'; get_categories();">Map Categories</button>
+                    <p><b>Mapping</b></p>
+                    <button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('cat_table').style.display='block'; get_categories();">Map Categories between Arcadier and Mongo</button>
                 </div>
             </div>
         </div>
+
+        <div class="w3-row-padding w3-padding-32" style="margin:0 -16px; width: auto;">
+            <div class="w3-third w3-margin-bottom">
+                <img src="https://www.w3schools.com/w3images/newyork.jpg" alt="New York" style="width:100%" class="w3-hover-opacity">
+                <div class="w3-container w3-white">
+                    <p><b>Start Import</b></p>
+                    <button class="w3-button w3-black w3-margin-bottom" onclick="document.getElementById('start_import').style.display='block';">Import</button>
+                </div>
+            </div>
         </div>
     </div>
 
     <!-- Ticket Modal -->
     <div id="ticketModal" class="w3-modal">
-        <form class="w3-modal-content w3-animate-top w3-card-4" action="/register" method="post">
+        <form id="configure_platforms" class="w3-modal-content w3-animate-top w3-card-4" action="/register" method="post">
+            <label for="user_email">User Email: </label>
+            <input id="user_email" type="text" name="user_email" value="">
+            <br>
             <label for="arcadier_domain">Arcadier Domain: </label>
             <input id="arcadier_domain" type="text" name="arcadier_domain_field" value="">
             <br>
@@ -62,23 +74,61 @@ body {font-family: "Lato", sans-serif}
             <br>
             <input type="submit" value="OK">
         </form>
-        
     </div>
 
     <div id="cat_table" class="w3-modal">
-       <div id="the_table" class="w3-modal-content w3-animate-top w3-card-4"></div>
+       <div id="the_table" class="w3-modal-content w3-animate-top w3-card-4">
+        <label for="user_email_mapping">User Email: </label>
+        <input id="user_email_mapping" type="text" name="user_email_mapping" value="">
+       </div>
+    </div>
+
+    <div id="start_import" class="w3-modal">
+        <div id="the_table" class="w3-modal-content w3-animate-top w3-card-4">
+            <label for="user_email_import">User Email: </label>
+            <input id="user_email_import" type="text" name="user_email_import" value="">
+            <br>
+            <br>
+            <button class="w3-button w3-black w3-margin-bottom" onclick="start_import();">Import</button>
+        </div>
     </div>
 
     <script>
         var categories_populated = false;
         var modal = document.getElementById('ticketModal');
         var modal2 = document.getElementById('cat_table');
+        var modal3 = document.getElementById('start_import');
+
+        $("#configure_platforms").submit(function(event){
+            event.preventDefault();
+            var settings = {
+                "url": "/register",
+                "method": "POST",
+                "data": {
+                    "user_email": $("#user_email").val(),
+                    "arcadier_domain": $("#arcadier_domain").val(),
+                    "client_id": $("#client_id").val(),
+                    "client_secret": $("#client_secret").val(),
+                    "mongo_username": $("#Mongo_username").val(),
+                    "mongo_password": $("#Mongo_password").val()
+                },
+                success: function(response){
+                    console.log(response);
+                }
+            }
+            $.ajax(settings);
+            return false;
+        });
+
         window.onclick = function(event) {
             if (event.target == modal) {
                 modal.style.display = "none";
             }
             if (event.target == modal2) {
                 modal2.style.display = "none";
+            }
+            if (event.target == modal3) {
+                modal3.style.display = "none";
             }
         }
 
@@ -192,7 +242,8 @@ body {font-family: "Lato", sans-serif}
             var table = document.getElementById("the_table");
             var row = table.querySelectorAll("tr");
             var map = {
-                "list":[]
+                "User": $("#user_email_mapping").val(),
+                "List":[]
             };
             for(var x=0;x<row.length;x++){
                 var mongo_category_name = row[x].children[0].id;
@@ -208,9 +259,40 @@ body {font-family: "Lato", sans-serif}
                     map_instance.arcadier_guid[i] = guid.value;
                 });
 
-                map.list.push(map_instance);
+                map.List.push(map_instance);
             }
-            console.log(map.list)
+            var save_map = {
+                "url": "/save_map",
+                "method": "POST",
+                "async": false,
+                "data": JSON.stringify(map),
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                success: function(response){
+                    console.log(response);
+                }
+            }
+            $.ajax(save_map);
+        }
+    
+        function start_import(){
+            console.log($("#user_email_import").val())
+            var data = {
+                "user": $("#user_email_import").val()
+            };
+            var settings = {
+                "url": "/start_import",
+                "method": "POST",
+                "headers": {
+                    "Content-Type": "application/json"
+                },
+                "data": JSON.stringify(data),
+                success: function(response){
+                    console.log(response)
+                }
+            }
+            $.ajax(settings);
         }
     </script>
 

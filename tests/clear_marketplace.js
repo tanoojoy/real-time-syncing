@@ -1,11 +1,7 @@
 let client = require('../sdk/client');
 
-
-
-
-//only use this if marketplace has 1000 items or less
-
-
+//deletes in batches of 1000
+//run "node tests/clear_marketplace.js"
 
 const get_all_items = new Promise(function(resolve, reject){
     var options = {
