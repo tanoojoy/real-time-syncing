@@ -64,6 +64,7 @@ app.post("/db_change", (req, res) =>{
         "Name": req.body.Name
       }
     };
+    console.log("Update from DB: " + options.data.Name);
 
     const update_item = new Promise(function(resolve, reject){
       client.Items.EditNewItem(options, function(err, result){
@@ -110,6 +111,7 @@ app.get("/etl", (req, res) => {
 })
 
 app.post("/get_arc_categories", (req, res) =>{
+
   const get_cats = new Promise(function(resolve, reject){
     client.Categories.getCategories(null, function(err, result){
       if(!err){
