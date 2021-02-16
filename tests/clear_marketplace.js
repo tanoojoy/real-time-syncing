@@ -1,7 +1,7 @@
 let client = require('../sdk/client');
 
 //deletes in batches of 1000
-//run "node tests/clear_marketplace.js"
+//run "node tests/clear_marketplace.js for each batch"
 
 const get_all_items = new Promise(function(resolve, reject){
     var options = {
