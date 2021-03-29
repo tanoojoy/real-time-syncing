@@ -126,8 +126,7 @@ app.post("/get_arc_categories", (req, res) =>{
 })
 
 app.post("/get_mongo_fields", async function(req, res) {
-  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
-  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  var db_client = mongo_db_init();
 
   try{
     var array_list = [];
@@ -157,8 +156,7 @@ app.post("/get_mongo_fields", async function(req, res) {
 app.post("/save_map", async function(req, res){
   console.log(req.body);
 
-  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
-  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  var db_client = mongo_db_init();
 
   try{
     await db_client.connect();
@@ -199,8 +197,7 @@ app.listen(process.env.PORT || 3000, () => {
 });
 
 async function register_credentials(details){
-  const uri = "mongodb+srv://" + details.mongo_username + ":" + details.mongo_password + "@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
-  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+  var db_client = mongo_db_init();
   var state;
   try {
     //connect to external database
@@ -233,7 +230,7 @@ async function register_credentials(details){
 
 async function main(item){
   
-  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+  const uri = "mongodb+srv://username:password@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   
   try {
@@ -258,4 +255,11 @@ async function main(item){
   finally {
       db_client.close();
   }
+}
+
+function mongo_db_init(){
+  const uri = "mongodb+srv://username:password@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
+  const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+
+  return db_client;
 }
