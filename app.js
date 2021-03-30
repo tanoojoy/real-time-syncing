@@ -230,7 +230,7 @@ async function register_credentials(details){
 
 async function main(item){
   
-  const uri = "mongodb+srv://username:password@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
+  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority";
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
   
   try {
@@ -258,7 +258,7 @@ async function main(item){
 }
 
 function mongo_db_init(){
-  const uri = "mongodb+srv://username:password@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
+  const uri = "mongodb+srv://Tanoo_mongo:(facethewallordie)@cluster0.gcu7q.mongodb.net/<dbname>?retryWrites=true&w=majority"; //stays this way
   const db_client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
   return db_client;
